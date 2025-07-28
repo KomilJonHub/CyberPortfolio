@@ -1,4 +1,4 @@
-# Hello, I'm Komiljon Karimov
+# Hi there, I’m Komiljon (Jon) Karimov 
 <a href="https://www.linkedin.com/in/YOUR-LINKEDIN-HERE"><img src="https://img.shields.io/badge/-LinkedIn-0072b1?&style=for-the-badge&logo=linkedin&logoColor=white" /></a>
 
 ---
@@ -9,8 +9,9 @@ I’m passionate about identifying vulnerabilities, analyzing threats, and conti
 
 ---
 
-##  Objective
+## Objective
 Seeking an entry-level role as a **Tier 1 SOC Analyst** where I can apply my skills in SIEM, threat detection, and cybersecurity fundamentals to support a secure and resilient digital environment.
+
 
 ---
 
@@ -75,5 +76,7 @@ Stay tuned — labs will be uploaded and linked soon.
 
 ---
 
->  **Let’s connect** — I’m open to internship opportunities, entry-level SOC roles, or mentorships in the cybersecurity field.
+> I’d love to connect with professionals and employers in cybersecurity.  
+> Whether you're hiring for an entry-level SOC role or open to mentorship, feel free to reach out!
+
 

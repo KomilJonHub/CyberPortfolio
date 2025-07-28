@@ -32,13 +32,10 @@ Seeking an entry-level role as a **Tier 1 SOC Analyst** where I can apply my ski
 ###  Network & Analysis
 <div>
   <img src="https://img.shields.io/badge/-Wireshark-1679A7?&style=for-the-badge&logo=Wireshark&logoColor=white" />
-  <img src="https://img.shields.io/badge/-Zeek-777BB4?&style=for-the-badge&logo=Zeek&logoColor=white" />
-  <img src="https://img.shields.io/badge/-Suricata-EF3B2D?&style=for-the-badge&logo=Suricata&logoColor=white" />
 </div>
 
 ###  Endpoint & OS
 <div>
-  <img src="https://img.shields.io/badge/-Velociraptor-4B275F?&style=for-the-badge&logo=Velociraptor&logoColor=white" />
   <img src="https://img.shields.io/badge/-Linux-000000?&style=for-the-badge&logo=linux&logoColor=white" />
   <img src="https://img.shields.io/badge/-Windows-0078D6?&style=for-the-badge&logo=windows&logoColor=white" />
 </div>

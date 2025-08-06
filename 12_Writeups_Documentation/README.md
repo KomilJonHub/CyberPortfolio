@@ -1,3 +1,0 @@
-# 12_Writeups_Documentation
-
-Placeholder for 12_Writeups_Documentation

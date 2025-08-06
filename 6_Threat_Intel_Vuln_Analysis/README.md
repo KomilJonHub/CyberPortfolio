@@ -1,3 +1,0 @@
-# 6_Threat_Intel_Vuln_Analysis
-
-Placeholder for 6_Threat_Intel_Vuln_Analysis

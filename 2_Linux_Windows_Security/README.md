@@ -1,3 +1,0 @@
-# 2_Linux_Windows_Security
-
-Placeholder for 2_Linux_Windows_Security

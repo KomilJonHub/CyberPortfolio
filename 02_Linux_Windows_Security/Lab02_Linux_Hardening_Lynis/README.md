@@ -1,15 +1,15 @@
 # Lab: Linux System Hardening with Lynis
 
-## 🔍 Objective
+##  Objective
 Audit a Linux virtual machine using Lynis and apply hardening techniques to fix system-level security warnings.
 
-## 🧰 Tools Used
+##  Tools Used
 - **Lynis 3.1.5**
 - **Ubuntu 22.04**
 - **iptables**
 - **ufw**
 
-## 🛠 Key Steps Performed
+##  Key Steps Performed
 1. Installed and updated Lynis
 2. Performed a full system scan with `sudo lynis --auditor cisco`
 3. Identified one warning and 50+ suggestions
@@ -17,16 +17,16 @@ Audit a Linux virtual machine using Lynis and apply hardening techniques to fix 
 5. Enabled UFW to persist firewall state on reboot
 6. Re-scanned and confirmed the warning was resolved
 
-## ⚠️ Warning Fixed
+##  Warning Fixed
 > `iptables module(s) loaded, but no rules active [FIRE-4512]`
 
-## ✅ Fix Applied
+##  Fix Applied
 - Added rules to accept SSH and HTTP traffic
 - Dropped all other INPUT traffic
 - Saved rules using `iptables-save`
 - Enabled UFW to persist configuration
 
-## 📸 Screenshots
+##  Screenshots
 
 | Before | After |
 |--------|-------|
@@ -37,7 +37,7 @@ Audit a Linux virtual machine using Lynis and apply hardening techniques to fix 
 - ![](./screenshots/iptables-save.png)
 - ![](./screenshots/ufw-enabled.png)
 
-## 🧠 Lessons Learned
+##  Lessons Learned
 - How to scan and interpret a Lynis security audit
 - How to configure and apply basic iptables rules
 - Using UFW to enforce firewall policies on startup

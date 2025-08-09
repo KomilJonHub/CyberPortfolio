@@ -6,7 +6,7 @@
 
 ---
 
-## 📝 What happened (story)
+##  What happened (story)
 Our branch users reported a scary ransomware‑style screen. Management suspected client files were stolen or changed.  
 I took point on the response: grab baselines, pull copies from HQ, verify each file’s integrity, validate the finance file with HMAC‑SHA256, and document everything cleanly.
 
@@ -14,7 +14,7 @@ I took point on the response: grab baselines, pull copies from HQ, verify each f
 
 ---
 
-## 🎯 Objectives
+##  Objectives
 - Reconstruct what happened and **prove** which files changed.
 - Use **MD5** for quick integrity checks and **HMAC‑SHA256** for authenticity on critical data.
 - Show why **FTP** is a problem and how to fix that class of risk.
@@ -22,7 +22,7 @@ I took point on the response: grab baselines, pull copies from HQ, verify each f
 
 ---
 
-## 🧰 Tools & Commands
+##  Tools & Commands
 - Packet Tracer (network + endpoints), Ubuntu CSE‑LABVM (analysis box)  
 - `md5sum` for hashing  
 - `openssl dgst -sha256 -hmac <key>` for HMAC  
@@ -30,7 +30,7 @@ I took point on the response: grab baselines, pull copies from HQ, verify each f
 
 ---
 
-## 🔍 Investigation (in order of evidence)
+##  Investigation (in order of evidence)
 
 ### 1) Quick authenticity check on a critical finance file (HMAC)
 Before touching anything else, I validated the finance file (`income.txt`) with **HMAC‑SHA256** to prove integrity **and** authenticity using a shared secret.
@@ -102,7 +102,7 @@ Also validated that the same insecure transfer path existed at HQ, which explain
 
 ---
 
-## ✅ Findings
+##  Findings
 - **Altered:** `Nclients.txt`, `SEclients.txt`, `SWclients.txt`
 - **Unaffected:** `NEclients.txt`, `NWclients.txt`, `Sclients.txt`
 - **Finance file:** `income.txt` **HMAC‑verified** (authentic + intact)
@@ -110,7 +110,7 @@ Also validated that the same insecure transfer path existed at HQ, which explain
 
 ---
 
-## 🧠 Lessons I’m taking forward
+##  Lessons I’m taking forward
 - Keep a **baseline hash inventory** for critical data (store it safely).
 - Use **HMAC** (or signatures) when authenticity matters, not just MD5/SHA.
 - Kill **FTP**; enforce **SFTP/FTPS** with proper auth and TLS.
@@ -119,13 +119,13 @@ Also validated that the same insecure transfer path existed at HQ, which explain
 
 ---
 
-## 📦 Artifacts
+##  Artifacts
 - `./screenshots/` — numbered in investigation order (01 → 10)  
 - [`evidence_hashes.txt`](./evidence_hashes.txt) — optional notes table for baseline vs current hashes (SAFE/ALTERED)
 
 ---
 
-## 🔧 Commands I used (representative)
+##  Commands I used (representative)
 ```bash
 # Quick MD5 against pasted content (from Packet Tracer text)
 echo -n '<file-contents>' | md5sum

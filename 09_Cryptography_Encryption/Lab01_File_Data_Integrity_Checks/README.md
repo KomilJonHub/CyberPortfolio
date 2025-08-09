@@ -3,11 +3,11 @@
 ## Objective
 
 This Packet Tracer scenario walks through a realistic incident where client data was encrypted and exfiltrated by an attacker.  
-Your goal is to restore the compromised files from a backup, verify their integrity using cryptographic hashes, identify any files that have been tampered with, and then use a keyed hash (HMAC) to validate a sensitive financial file.  
+My goal in there, as a role of Mike, is to restore the compromised files from a backup, verify their integrity using cryptographic hashes, identify any files that have been tampered with, and then use a keyed hash (HMAC) to validate a sensitive financial file, and gathering all the necessary information, report to my supervisor Sally about the incident.   
 
 From a security operations (SOC/GRC) perspective this lab reinforces two key concepts:
 
-- **Data integrity matters:** after any cyber‑attack you must verify that backups and restored files are unaltered before trusting them again.  
+- **Data integrity matters:** after any cyber‑attack it is a must to verify that backups and restored files are unaltered before trusting them again.  
 - **Cryptographic assurance:** simple hashes detect accidental or malicious changes, while HMAC adds authentication so only those with the secret key can produce the same digest.
 
 ## Tools Used
@@ -28,7 +28,7 @@ From a security operations (SOC/GRC) perspective this lab reinforces two key con
 2. **Verify integrity using MD5 hashing.**  
    - Opened each downloaded file in Pluma and copied its contents to the lab VM.  
    - Generated an MD5 hash with `echo -n 'contents' | md5sum` and compared it against the stored hashes.  
-   - Five files matched their expected values.  The third file (`Nclients.txt`) produced a different hash, indicating tampering.  
+   - Five files matched their expected values.  Three files (`Nclients.txt`, `NEclients.txt` `NWclients.txt`) produced a different hash, indicating tampering.  
 
 3. **Report and isolate the tampered file.**  
    - Wrote an email to the branch supervisor describing the compromise and attached the list of hashes.  

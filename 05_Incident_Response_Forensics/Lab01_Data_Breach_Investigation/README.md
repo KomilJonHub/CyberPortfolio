@@ -1,145 +1,134 @@
-# Lab01 — Incident Response: File and Data Integrity Checks
+# Lab01 — Incident Response: File & Data Integrity Checks (Simulation)
 
-**Role in Simulation:** SOC Analyst “Mike” (Branch Office IT)  
-**Environment:** Cisco Packet Tracer network + Ubuntu CSE-LABVM  
-**Type:** Simulated cyberattack and incident response in a virtual environment
+**Who I am in this lab:** I’m acting as “Mike,” the branch IT/SOC analyst responding to a suspected ransomware incident.  
+**Environment:** 100% virtual — Cisco Packet Tracer network + Ubuntu CSE‑LABVM (no real data).  
+**Goal:** Treat this like a real case: confirm the breach, preserve evidence, verify integrity (hash/HMAC), and recommend controls.
 
 ---
 
-## 📝 Scenario
+## 📝 What happened (story)
+Our branch users reported a scary ransomware‑style screen. Management suspected client files were stolen or changed.  
+I took point on the response: grab baselines, pull copies from HQ, verify each file’s integrity, validate the finance file with HMAC‑SHA256, and document everything cleanly.
 
-In this virtual lab, I stepped into the role of **Mike**, the IT support at the branch office of a fictional organization.  
-One morning, the branch network started showing signs of a **ransomware attack** — an ominous message appeared on one of the office machines, demanding payment to unlock files.  
-
-The organization suspected that client files had been stolen and possibly tampered with. My mission was clear:
-
-- Recover and verify the integrity of the client data.
-- Investigate the scope of the compromise.
-- Provide forensic evidence for management.
-- Recommend security improvements to prevent this from happening again.
-
-Even though this was a **controlled, virtual environment**, I treated it like a real-world incident — following a structured **Incident Response workflow** from detection to containment, analysis, and reporting.
+> This is a simulation, but I follow the **actual** IR flow: triage → collect evidence → analyze → report → recommend.
 
 ---
 
 ## 🎯 Objectives
-
-1. Retrieve **baseline hash values** from HQ for all client files.  
-2. Download the latest copies from HQ to the branch for comparison.  
-3. Detect any **tampering** using MD5 hashing.  
-4. Verify the authenticity and integrity of a sensitive finance file using **HMAC-SHA256**.  
-5. Escalate findings to my supervisor and preserve all evidence.
+- Reconstruct what happened and **prove** which files changed.
+- Use **MD5** for quick integrity checks and **HMAC‑SHA256** for authenticity on critical data.
+- Show why **FTP** is a problem and how to fix that class of risk.
+- Produce an IR‑style write‑up with screenshots/evidence.
 
 ---
 
-## 🧰 Tools & Commands Used
-
-- **Packet Tracer** – to simulate the branch and HQ networks.
-- **Ubuntu Linux CLI** – for file analysis and cryptographic checks.
-- **`md5sum`** – to generate and compare file hashes.
-- **`openssl dgst -sha256 -hmac <key>`** – to compute and verify HMAC.
-- **FTP client** – used intentionally in the simulation to highlight its insecurity.
+## 🧰 Tools & Commands
+- Packet Tracer (network + endpoints), Ubuntu CSE‑LABVM (analysis box)  
+- `md5sum` for hashing  
+- `openssl dgst -sha256 -hmac <key>` for HMAC  
+- FTP client (intentionally insecure in the lab to demonstrate risk)
 
 ---
 
-## 🔍 Step-by-Step Investigation
+## 🔍 Investigation (in order of evidence)
 
-### **1) Confirming the breach**
-I began by accessing my branch workstation and was greeted by a **ransomware-style message** — a clear indicator that something serious had happened.  
-The attackers claimed files had been encrypted and demanded payment.  
-![](./screenshots/02_branch_office_ransomware_screen.png)
-
-In a real-world situation, this is the point where you **contain the incident** — isolate affected systems and prevent further spread. But in this lab, my goal was to **investigate**.
-
----
-
-### **2) Collecting baseline integrity data**
-Before touching any possibly compromised files, I retrieved **baseline MD5 hashes** from HQ — the “known-good” fingerprints for each client file.  
-These would be my benchmark to determine if files had been altered.  
+### 1) Quick authenticity check on a critical finance file (HMAC)
+Before touching anything else, I validated the finance file (`income.txt`) with **HMAC‑SHA256** to prove integrity **and** authenticity using a shared secret.
+  
 ![](./screenshots/01_initial_hmac_check.png)
 
 ---
 
-### **3) Pulling fresh copies from HQ**
-Using FTP (as per the simulation), I downloaded six client files from HQ:  
-`NEclients.txt`, `NWclients.txt`, `Nclients.txt`, `SEclients.txt`, `SWclients.txt`, and `Sclients.txt`.  
-![](./screenshots/03_ftp_data_exfiltration_branch.png)  
-![](./screenshots/04_branch_local_dir_listing.png)
+### 2) User‑facing impact at the branch — ransomware/defacement
+This is what kicked off the incident: the workstation showed a ransomware‑style message. I treated the host as compromised and focused on integrity + exfiltration impact.
 
-In reality, FTP should **never** be used for sensitive transfers — it’s unencrypted and easily intercepted. The simulation intentionally used it to show the risk.
+![](./screenshots/02_branch_office_ransomware_screen.png)
 
 ---
 
-### **4) Previewing the data**
-Opening one of the client files revealed **personally identifiable information** (names, contact details, etc.). Even in a simulation, it was easy to see how damaging this would be in a real breach.  
+### 3) Pulling client files (lab uses FTP to illustrate the risk)
+Per the exercise, I retrieved six regional client files from HQ using **FTP** (insecure by design here). In the real world, this should be **SFTP/FTPS** with authN + encryption.
+
+![](./screenshots/03_ftp_data_exfiltration_branch.png)
+
+---
+
+### 4) Sanity check on what landed locally
+Confirmed what I actually pulled down so I could hash locally and compare to HQ baselines.
+
+![](./screenshots/04_branch_local_dir_listing.png)
+
+---
+
+### 5) Why this matters — a peek at the client data
+Even in a lab, you can see why integrity matters: the files look like they contain PII/contacts. If altered/exfiltrated, this becomes a real disclosure risk.
+
 ![](./screenshots/05_viewing_stolen_client_data_branch.png)
 
 ---
 
-### **5) Detecting tampering with hashing**
-I computed MD5 hashes for each of the branch’s client files and compared them to the HQ baselines.
+### 6) Follow‑up HMAC/hash verification on branch artifacts
+Ran additional checks so I could separate good vs. altered files with evidence.
 
-- `NEclients.txt` – **match** ✅  
-- `NWclients.txt` – **match** ✅  
-- `Nclients.txt` – **mismatch** ❌ (altered)  
-- `SEclients.txt` – **mismatch** ❌ (altered)  
-- `SWclients.txt` – **mismatch** ❌ (altered)  
-- `Sclients.txt` – **match** ✅
-
-![](./screenshots/07_northwest_clients_hash_verification.png)  
-![](./screenshots/08_southeast_clients_hash_verification.png)  
-![](./screenshots/09_southwest_clients_hash_verification.png)
-
----
-
-### **6) Validating the finance file with HMAC**
-One critical file, `income.txt`, needed **both integrity and authenticity** verification.  
-I used a shared secret (`cisco123`) with HMAC-SHA256 to compute its cryptographic signature.  
-The computed HMAC matched the original — confirming it was unaltered and authentic.  
 ![](./screenshots/06_hmac_verification_branch_file.png)
 
 ---
 
-### **7) Checking HQ systems**
-To understand the attack scope, I also connected to HQ via FTP and confirmed that files there were accessible over the same insecure channel — a major vulnerability in this simulated environment.  
+### 7) Hash comparison — NW clients (baseline vs current)
+This one matched baseline (no tampering).
+
+![](./screenshots/07_northwest_clients_hash_verification.png)
+
+---
+
+### 8) Hash comparison — SE clients (mismatch → altered)
+Mismatch confirmed: the SE file did not match the HQ baseline.
+
+![](./screenshots/08_southeast_clients_hash_verification.png)
+
+---
+
+### 9) Hash comparison — SW clients (mismatch → altered)
+Another mismatch; SW file integrity failed.
+
+![](./screenshots/09_southwest_clients_hash_verification.png)
+
+---
+
+### 10) HQ side confirmation (same weak protocol path)
+Also validated that the same insecure transfer path existed at HQ, which explains how easy tampering/exfiltration would be in a real environment.
+
 ![](./screenshots/10_hq_data_exfiltration.png)
 
 ---
 
-## 📑 Findings
-
-- **Tampered files:** `Nclients.txt`, `SEclients.txt`, `SWclients.txt`  
-- **Untouched files:** `NEclients.txt`, `NWclients.txt`, `Sclients.txt`  
-- **Finance file:** `income.txt` passed HMAC verification (unaltered and authentic).  
-- **Protocol risk:** FTP in use — unencrypted, vulnerable to interception and tampering.
-
----
-
-## 🧠 Lessons Learned
-
-- Always maintain a **baseline hash inventory** for critical files.
-- Use **HMAC or digital signatures** for authenticity checks — hashes alone can be forged.
-- Replace FTP with **SFTP/FTPS** for secure file transfers.
-- Incorporate **central logging and SIEM monitoring** to catch integrity breaches faster.
-- Preserve and document **all evidence** for post-incident review.
+## ✅ Findings
+- **Altered:** `Nclients.txt`, `SEclients.txt`, `SWclients.txt`
+- **Unaffected:** `NEclients.txt`, `NWclients.txt`, `Sclients.txt`
+- **Finance file:** `income.txt` **HMAC‑verified** (authentic + intact)
+- **Root cause pattern:** unencrypted FTP increased exposure to tampering/exfiltration
 
 ---
 
-## 📂 Evidence
-
-All investigation screenshots are stored in the `./screenshots` folder.  
-An optional [`evidence_hashes.txt`](./evidence_hashes.txt) file lists baseline vs. current hashes.
+## 🧠 Lessons I’m taking forward
+- Keep a **baseline hash inventory** for critical data (store it safely).
+- Use **HMAC** (or signatures) when authenticity matters, not just MD5/SHA.
+- Kill **FTP**; enforce **SFTP/FTPS** with proper auth and TLS.
+- Centralize logs to a **SIEM** and monitor for integrity anomalies.
+- Practice evidence capture and clear reporting — it saves time under pressure.
 
 ---
 
-## 💡 Why this matters
+## 📦 Artifacts
+- `./screenshots/` — numbered in investigation order (01 → 10)  
+- [`evidence_hashes.txt`](./evidence_hashes.txt) — optional notes table for baseline vs current hashes (SAFE/ALTERED)
 
-This lab was more than just following instructions — it was an **end-to-end incident simulation** where I got to act as a SOC analyst responding to a real threat scenario.
+---
 
-I had to think like an investigator:
-- Confirm the attack.
-- Gather and preserve evidence.
-- Validate integrity with cryptographic methods.
-- Communicate findings and recommend preventive measures.
+## 🔧 Commands I used (representative)
+```bash
+# Quick MD5 against pasted content (from Packet Tracer text)
+echo -n '<file-contents>' | md5sum
 
-It’s exactly the type of **practical, hands-on experience** I want to bring into my work as a cybersecurity professional.
+# HMAC-SHA256 for a sensitive file (proves integrity + authenticity)
+openssl dgst -sha256 -hmac cisco123 income.txt

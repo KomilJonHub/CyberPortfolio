@@ -46,14 +46,14 @@ The numbered images in this folder capture the most important steps in the inves
 
 | Step | Description | Image |
 |-----|-------------|------|
-|1|Branch laptop shows a ransomware message; initial MD5/HMAC checks on the lab VM.|![](screenshots/2.png)|
+|1|Branch laptop shows a ransomware message; initial MD5/HMAC checks on the lab VM.|![](screenshots/1.png)|
 |2|FTP session on the branch laptop downloading client data from the HQ server.|![](screenshots/3.png)|
 |3|Listing of the downloaded files on the branch machine.|![](screenshots/4.png)|
 |4|Hashing the NE and NW client files – hashes match the trusted values.|![](screenshots/5.png)|
 |5|Hashing the Nclients file – hash differs from the stored value, indicating tampering.|![](screenshots/6.png)|
 |6|Hashing additional client files (SE and SW) for completeness.|![](screenshots/7.png)|
 |7|Supervisor’s FTP session downloading the suspicious file(s) from the HQ server for analysis.|![](screenshots/9.png)|
-|8|Computing a keyed SHA‑256 HMAC for the `income.txt` file using OpenSSL – the digest matches the original.|![](screenshots/1.png)|
+|8|Computing a keyed SHA‑256 HMAC for the `income.txt` file using OpenSSL – the digest matches the original.|![](screenshots/10.png)|
 
 ## Lessons Learned / SOC & GRC Relevance
 

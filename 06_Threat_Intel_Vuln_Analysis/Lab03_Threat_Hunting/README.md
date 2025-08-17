@@ -1,183 +1,164 @@
-# Lab03 – Threat Hunting
+# Lab03 – Threat Hunting Investigation
 
 ## Introduction
-This project documents a full **threat hunting investigation** performed in a simulated SOC environment. The objective was to identify Indicators of Compromise (IoCs), trace malicious activity across multiple systems, and correlate evidence from **logs, processes, and network artifacts** to confirm the presence of an intrusion.
+This lab simulates a **real-world threat hunting scenario** where a security analyst investigates suspicious activity across multiple data sources. The exercise demonstrates how to uncover evidence of intrusion, persistence mechanisms, and **data exfiltration** by correlating logs, host-based artifacts, and network traffic.  
 
-Unlike reactive alert triage, **threat hunting is proactive** — it requires analysts to form hypotheses, pivot between hosts, and link small anomalies into a larger narrative of attack.  
+Threat hunting goes beyond waiting for automated alerts — it requires **active hypothesis-driven investigation** to detect Indicators of Compromise (IoCs) that adversaries attempt to conceal.  
 
-By completing this lab, I demonstrated:  
-- Detecting abnormal network traffic from firewall logs.  
-- Identifying suspicious processes and persistence via **Windows Event Viewer, PowerShell, and task analysis**.  
-- Analyzing Linux-based attacker scripts and active connections.  
-- Investigating **DNS beaconing activity** and abnormal queries.  
-- Correlating logs across systems to reconstruct the **attack chain**.
+By completing this lab, I demonstrated the ability to:  
+- Analyze **Windows Event Viewer logs** for DNS anomalies.  
+- Investigate **PowerShell execution and persistence mechanisms**.  
+- Use **Linux tools** to analyze attacker scripts and outbound connections.  
+- Review **firewall logs** to confirm data exfiltration attempts.  
+- Correlate host- and network-based artifacts to reconstruct the attack chain.  
 
 ---
 
-## Scenario
-The simulated company, **Structureality Inc.**, was suspected of compromise following ISP and threat intelligence alerts. As the analyst, my role was to investigate four key incidents:  
+## Objectives
+The investigation was structured around four main objectives:  
 
-1. **Network scanning from an external attacker (Kali VM).**  
-2. **Abnormal secure web connections consuming resources on DC10.**  
-3. **Suspicious processes and FTP-based exfiltration attempts.**  
-4. **Strange DNS beaconing from a compromised Windows client (PC10).**  
-
-These represent a realistic **multi-stage intrusion**, progressing from reconnaissance → persistence → lateral movement → exfiltration.
+1. **Identify suspicious DNS activity** pointing to possible command-and-control (C2) communication.  
+2. **Examine PowerShell activity** on endpoints for evidence of execution and persistence.  
+3. **Analyze Linux netstat results and attacker scripts** to confirm malicious connectivity.  
+4. **Correlate findings with firewall logs** to confirm data exfiltration and the responsible internal IP.  
 
 ---
 
 ## Lab Environment
-The investigation took place across multiple virtual machines designed to mimic a corporate network:  
+The lab was conducted in a controlled training environment that mirrored a realistic SOC investigation.  
 
-- **LAMP (Ubuntu Server)** – hosting services, logging inbound traffic.  
-- **Kali Linux** – acting as the attacker system.  
-- **DC10 (Windows Server 2019)** – domain controller and secure website host.  
-- **MS10 (Windows Server 2016)** – internal server running scheduled tasks.  
-- **PC10 (Windows Server 2019)** – client workstation with poor security hygiene.  
+- **Windows 10 Endpoint**  
+  - Tools: Event Viewer, PowerShell  
+  - Focus: DNS logs, script execution, scheduled tasks  
 
-Each host provided unique evidence (firewall logs, PowerShell scripts, event logs) that had to be pieced together to uncover the full scope of the attack.
+- **Linux (Kali) Environment**  
+  - Tools: `netstat`, script inspection  
+  - Focus: Malicious connectivity and exfiltration scripts  
 
----
-
-## Tools and Techniques
-A variety of **host-based and network tools** were used:  
-
-- **Linux (LAMP & Kali):**  
-  - `iptables` logging (`/var/log/kern.log`) for inbound traffic.  
-  - `grep`, `tail`, and `netstat` for tracing attacker activity.  
-  - Inspection of attacker script (`lab04demo4.sh`).  
-
-- **Windows Servers (DC10 & MS10):**  
-  - `netstat -nop tcp` to detect abnormal HTTPS connections.  
-  - `tasklist` and `Get-WmiObject` to identify suspicious PIDs.  
-  - `Get-ScheduledTask` to confirm persistence mechanisms.  
-
-- **Windows Client (PC10):**  
-  - Event Viewer (DNS Client Operational logs).  
-  - Filtering Event ID `3010` to capture DNS queries.  
-  - Analysis of suspicious FQDNs (e.g., `badsite.ru`) for beaconing activity.  
-
-- **Firewall Logs:**  
-  - Reviewed for signs of exfiltration and abnormal outbound sessions.  
+- **Firewall Logs**  
+  - Focus: Detection of outbound data exfiltration  
 
 ---
 
-## Screenshots Evidence
-Throughout this README, selected screenshots from the `/screenshots` folder are included to demonstrate findings and confirm task success.  
+## Tools & Techniques
+- **Windows Event Viewer** (Event IDs: 1001 – DNS assignment, 3010 – DNS queries)  
+- **PowerShell Analysis** (script execution, scheduled task persistence)  
+- **Linux Command-Line** (`netstat`, reviewing malicious `.sh` scripts)  
+- **Firewall Log Review** (traffic correlation with suspected exfiltration host)  
+- **Threat Hunting Process**  
+  - Hypothesis → Investigation → Correlation → Confirmation  
 
+---
 
 ## Investigation Walkthrough
 
-### 1. External Scanning Detected on LAMP (Ubuntu Server)
-The hunt began by examining the **LAMP server’s firewall logs** (`/var/log/kern.log`) for unusual inbound traffic.  
-Using `grep` and `tail`, I identified **high-volume TCP/UDP probes** originating from the **Kali Linux attacker VM (192.168.1.55)**.  
-
-📸 Screenshot: [Firewall Log Showing Reconnaissance Scans](./screenshots/1.png)  
-
-This confirmed early-stage **reconnaissance activity** — a classic attacker tactic to map live hosts and open ports before exploitation.
+The threat hunting process was conducted in a structured sequence, guided by the lab instructions. Each stage provided key insights into attacker behavior.  
 
 ---
 
-### 2. Abnormal HTTPS Connections on DC10
-Next, I shifted focus to **DC10 (Windows Server 2019)**, where administrators reported abnormal CPU and memory use.  
-- Running `netstat -nop tcp` revealed multiple persistent outbound **HTTPS (port 443) sessions** to an external IP that was not a trusted domain.  
-- Mapping the suspicious PID with `tasklist /fi "PID eq XXXX"` showed it was tied to a **non-standard process**, not a legitimate Windows service.  
-
-📸 Screenshot: [Suspicious Persistent HTTPS Connections](./screenshots/2.png)  
-
-This indicated the attacker had established a **command-and-control (C2) channel** on DC10, bypassing normal defenses by tunneling through HTTPS.
+### 🔎 Step 1 – Firewall Reconnaissance Detection  
+- **Action**: Reviewed firewall logs for scanning attempts from a suspected attacker machine (Kali).  
+- **Finding**: Evidence of network scans targeting multiple internal systems was logged, confirming reconnaissance activity from an external adversary.  
+- **Screenshot 1**: Firewall log entries showing packet captures from the scanning host.  
 
 ---
 
-### 3. Persistence via Scheduled Task on MS10
-On **MS10 (Windows Server 2016)**, the investigation focused on signs of persistence.  
-- Using PowerShell, I ran `Get-ScheduledTask` and `Get-WmiObject win32_process` to review active processes and scheduled jobs.  
-- A suspicious scheduled task (`lab04demo3.ps1`) was discovered repeatedly spawning under **SYSTEM privileges**.  
-- Correlation with PIDs confirmed it was the same persistence mechanism seen in earlier PowerShell analysis.  
-
-📸 Screenshot: [Malicious Scheduled Task Executing Persistently](./screenshots/3.png)  
-
-This step demonstrated how attackers often **use scheduled tasks to ensure their payloads survive reboots** and maintain access.
-
----
-
-### 4. Threat Hunting Challenges
-During this stage, some of the artifacts did not present clear evidence of compromise. For example:  
-- Not all scheduled tasks appeared malicious at first glance.  
-- Some HTTPS traffic looked normal until correlated with resource spikes and suspicious PIDs.  
-- Certain log entries had to be cross-checked across systems before they made sense.  
-
-📸 Screenshot: [Investigator’s Log Review in Progress](./screenshots/4.png)  
-
-This reflected the **real-world challenge** of threat hunting: separating noise from signal requires patience, cross-validation, and hypothesis testing.
-
-
-### 5. Attacker Script Analysis on Kali (Linux)
-Pivoting to the **Kali Linux attacker system**, I reviewed files left behind by the adversary.  
-- Inside `/home/kali/Downloads`, a suspicious script named **`lab04demo4.sh`** was discovered.  
-- Opening the script revealed commands for **FTP-based data exfiltration**, looping through directories and sending files to a remote server.  
-
-📸 Screenshot: [Malicious Bash Script – lab04demo4.sh](./screenshots/5.png)  
-
-This confirmed the attacker had automated their **data theft** using a custom exfiltration script.
+### 🔎 Step 2 – Windows DNS Client Events (Event ID 1001 & 3010)  
+- **Action**: Investigated **DNS Client logs** in Windows Event Viewer.  
+  - Event ID **1001** showed assignment of DNS servers.  
+  - Event ID **3010** revealed DNS queries made by the host.  
+- **Finding**: Queries to suspicious domains such as `badsite.ru` were uncovered.  
+- **Screenshot 2**: Event Viewer filtered to Event ID 3010.  
+- **Screenshot 3**: Event ID 1001 showing assigned DNS server (10.1.16.1).  
+- **Screenshot 4**: Query to malicious domain `badsite.ru`.  
 
 ---
 
-### 6. DNS Beaconing from PC10 (Windows Client)
-The next step focused on **PC10 (Windows Server 2019)**, where DNS logs suggested unusual behavior.  
-- Using **Event Viewer → Applications and Services Logs → Microsoft → Windows → DNS Client Events → Operational**, I filtered for Event ID **3010**.  
-- The logs revealed repeated queries to a known malicious FQDN: **`badsite.ru`**.  
-- These beaconing attempts matched the timeline of the attacker’s C2 activity observed earlier.  
-
-📸 Screenshot: [DNS Client Log Showing Malicious FQDN Queries](./screenshots/16.png)  
-
-This proved that PC10 was compromised and was actively **reaching out to the attacker’s infrastructure**.
+### 🔎 Step 3 – PowerShell Execution Analysis  
+- **Action**: Executed suspicious PowerShell scripts provided in the environment (`lab04demo2.ps1`, `lab04demo3.ps1`).  
+- **Finding**:  
+  - Script `lab04demo2.ps1` repeatedly attempted connections until termination.  
+  - Script `lab04demo3.ps1` demonstrated persistence behavior by scheduling tasks.  
+- **Screenshot 5**: Execution of `lab04demo2.ps1` showing connection attempts.  
+- **Screenshot 6**: Evidence of malicious PowerShell activity from scheduled tasks (`lab04demo3.ps1`).  
 
 ---
 
-### 7. Evidence of Data Exfiltration
-The final stage was to confirm whether data had actually left the network.  
-- Reviewing firewall logs, I identified **large outbound FTP sessions** tied to internal IPs previously flagged in host investigations.  
-- The transfer patterns and sizes aligned with the activity scripted in `lab04demo4.sh`.  
-
-📸 Screenshot: [Firewall Log Showing Outbound FTP Exfiltration](./screenshots/7.png)  
-
-This provided conclusive proof of **data exfiltration**.
+### 🔎 Step 4 – Linux Network Forensics (Kali)  
+- **Action**: On the Linux machine, used `netstat -np` to identify live malicious connections.  
+- **Finding**: Multiple connections to external IPs (`10.1.16.1:443`, `10.1.16.11:37622`) confirmed command-and-control (C2) channels.  
+- **Screenshot 7**: Netstat output showing persistent established connections.  
+- **Screenshot 8**: Review of `Lab04demo4.sh` script revealing automated outbound exfiltration to `ca.ad.structurereality.com` over port 443.  
 
 ---
 
-## Findings and Lessons Learned
-
-**Key Findings**  
-1. **Reconnaissance:** External scans from Kali targeted LAMP and other internal assets.  
-2. **C2 Communication:** DC10 maintained persistent HTTPS connections with a malicious host.  
-3. **Persistence:** MS10 executed a malicious scheduled PowerShell script (`lab04demo3.ps1`).  
-4. **Beaconing:** PC10 generated repeated DNS queries to `badsite.ru`.  
-5. **Exfiltration:** Firewall logs and `lab04demo4.sh` confirmed bulk FTP data theft.  
-
-**Lessons Learned**  
-- **Correlation is critical:** No single log source told the full story — combining Linux logs, Windows processes, and firewall data exposed the attack chain.  
-- **Persistence mechanisms are subtle:** Scheduled tasks are easy to overlook unless tied back to suspicious processes.  
-- **C2 hides in plain sight:** HTTPS and DNS are common protocols that attackers abuse to blend into normal traffic.  
-- **Proactive hunting pays off:** Without manual investigation, much of this activity would not have triggered alerts.  
+### 🔎 Step 5 – Firewall Exfiltration Logs  
+- **Action**: Correlated host findings with **firewall logs** to confirm large-scale data exfiltration.  
+- **Finding**: IP `10.1.16.2` was identified as the primary source of exfiltration traffic, transferring large amounts of data out of the network.  
+- **Screenshot 9**: Firewall log snippet highlighting outbound transfer from `10.1.16.2`.  
+- **Screenshot 10**: Analyst confirmation question identifying `10.1.16.2` as the IoC for exfiltration.  
 
 ---
 
-## Screenshots Reference Table
+### 🔎 Step 6 – Consolidation of Indicators of Compromise (IoCs)  
+By the end of the investigation, multiple IoCs were identified across host and network layers:  
+- Suspicious DNS queries: `badsite.ru`  
+- Malicious PowerShell scripts: `lab04demo2.ps1`, `lab04demo3.ps1`  
+- Attacker persistence: Scheduled tasks via PowerShell  
+- Malicious Linux script: `Lab04demo4.sh`  
+- Malicious outbound host: `10.1.16.2` (responsible for exfiltration)  
 
-| Step | Description | Image |
-|------|-------------|-------|
-|1|Linux firewall (iptables) configured to log inbound scan attempts from Kali.|![](./screenshots/1.png)|
-|2|Windows DC10 showing persistent HTTPS sessions in netstat output.|![](./screenshots/2.png)|
-|3|Malicious scheduled PowerShell task on MS10 for persistence.|![](./screenshots/3.png)|
-|4|Windows Event Viewer highlighting DNS Client log setup and noise filtering.|![](./screenshots/4.png)|
-|5|Attacker’s malicious Bash script (`lab04demo4.sh`) automating FTP exfiltration.|![](./screenshots/5.png)|
-|6|Firewall outbound traffic anomalies tied to FTP transfers.|![](./screenshots/7.png)|
-|7|DNS beaconing to malicious domain `badsite.ru` (PC10 Event Viewer logs).|![](./screenshots/16.png)|
+**Screenshots 11–16** provide supporting evidence of IoCs and analyst validation steps.  
+
 
 ---
 
-## Conclusion
-This lab simulated a **complete intrusion kill chain**, from initial reconnaissance to data theft. By manually investigating logs and correlating artifacts, I successfully uncovered attacker activity across multiple systems.  
+## Findings & Lessons Learned
 
-For a SOC analyst, these skills translate directly into real-world scenarios where attackers rely on stealthy persistence, living-off-the-land tactics, and protocol abuse to evade detection.  
+This lab reinforced the **importance of proactive threat hunting** in uncovering adversary activity that may bypass automated defenses.  
+
+Key takeaways:  
+- **DNS anomalies are early warning signs** – monitoring Event IDs 1001 and 3010 can uncover suspicious domains.  
+- **PowerShell remains a powerful attacker tool** – scripts often enable persistence and lateral movement.  
+- **Linux logs and scripts reveal attacker methodology** – outbound exfiltration scripts are a common final step.  
+- **Firewall correlation is critical** – only by tying endpoint events with network logs was the exfiltrating host (`10.1.16.2`) confirmed.  
+- **Documenting IoCs ensures actionable intelligence** – findings can feed into SIEM/SOAR for automation in real-world SOCs.  
+
+This exercise highlighted how a defender must **connect host-based forensics, network telemetry, and attacker TTPs** to build the full kill chain.
+
+---
+
+## Screenshot Reference Table
+
+| # | Step | Description | Screenshot |
+|---|------|-------------|------------|
+| 1 | Firewall Recon | Firewall logs capturing scanning attempts from attacker host | ![](screenshots/1.png) |
+| 2 | DNS Analysis | Event Viewer – filtering DNS logs by Event ID 3010 | ![](screenshots/2.png) |
+| 3 | DNS Analysis | Event ID 1001 showing DNS server assignment | ![](screenshots/3.png) |
+| 4 | DNS Analysis | Suspicious query to malicious domain `badsite.ru` | ![](screenshots/4.png) |
+| 5 | PowerShell Analysis | Execution of `lab04demo2.ps1` showing repeated outbound attempts | ![](screenshots/5.png) |
+| 6 | PowerShell Persistence | Scheduled task activity linked to `lab04demo3.ps1` | ![](screenshots/6.png) |
+| 7 | Linux Netstat | Established malicious connections (C2 channels) | ![](screenshots/7.png) |
+| 8 | Linux Script Review | Malicious exfiltration script `Lab04demo4.sh` targeting external domain | ![](screenshots/8.png) |
+| 9 | Firewall Exfil | Firewall log snippet showing outbound data from `10.1.16.2` | ![](screenshots/9.png) |
+| 10 | Analyst Validation | Confirmation step – identifying exfiltrating host | ![](screenshots/10.png) |
+| 11 | IoC Collection | Documenting suspicious DNS IoCs | ![](screenshots/11.png) |
+| 12 | IoC Collection | Identifying malicious PowerShell script activity | ![](screenshots/12.png) |
+| 13 | IoC Collection | Correlation of Linux persistence and exfiltration artifacts | ![](screenshots/13.png) |
+| 14 | IoC Collection | Firewall logs cross-checked with host evidence | ![](screenshots/14.png) |
+| 15 | Final Confirmation | Analyst answering final lab validation questions | ![](screenshots/15.png) |
+| 16 | Investigation Closure | Wrap-up of IoCs and attack chain confirmation | ![](screenshots/16.png) |
+
+---
+
+## Final Summary
+
+This lab simulated a **multi-stage intrusion** and required connecting evidence across different platforms. By progressing step-by-step and validating findings with multiple data sources, I was able to:  
+
+- Detect **initial reconnaissance and malicious DNS activity**.  
+- Identify **PowerShell persistence mechanisms**.  
+- Confirm **C2 and exfiltration traffic from Linux and firewall logs**.  
+- Deliver a structured **IoC list and validated attack chain**.  
+
+This mirrors real-world SOC workflows where **analysts must piece together fragmented signals into a coherent narrative** of the attack.  
+

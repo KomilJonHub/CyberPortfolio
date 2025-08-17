@@ -56,14 +56,14 @@ The threat hunting process was conducted in a structured sequence, guided by the
 
 ---
 
-### 🔎 Step 1 – Firewall Reconnaissance Detection  
+###  Step 1 – Firewall Reconnaissance Detection  
 - **Action**: Reviewed firewall logs for scanning attempts from a suspected attacker machine (Kali).  
 - **Finding**: Evidence of network scans targeting multiple internal systems was logged, confirming reconnaissance activity from an external adversary.  
 - **Screenshot 1**: Firewall log entries showing packet captures from the scanning host.  
 
 ---
 
-### 🔎 Step 2 – Windows DNS Client Events (Event ID 1001 & 3010)  
+###  Step 2 – Windows DNS Client Events (Event ID 1001 & 3010)  
 - **Action**: Investigated **DNS Client logs** in Windows Event Viewer.  
   - Event ID **1001** showed assignment of DNS servers.  
   - Event ID **3010** revealed DNS queries made by the host.  
@@ -74,7 +74,7 @@ The threat hunting process was conducted in a structured sequence, guided by the
 
 ---
 
-### 🔎 Step 3 – PowerShell Execution Analysis  
+###  Step 3 – PowerShell Execution Analysis  
 - **Action**: Executed suspicious PowerShell scripts provided in the environment (`lab04demo2.ps1`, `lab04demo3.ps1`).  
 - **Finding**:  
   - Script `lab04demo2.ps1` repeatedly attempted connections until termination.  
@@ -84,7 +84,7 @@ The threat hunting process was conducted in a structured sequence, guided by the
 
 ---
 
-### 🔎 Step 4 – Linux Network Forensics (Kali)  
+###  Step 4 – Linux Network Forensics (Kali)  
 - **Action**: On the Linux machine, used `netstat -np` to identify live malicious connections.  
 - **Finding**: Multiple connections to external IPs (`10.1.16.1:443`, `10.1.16.11:37622`) confirmed command-and-control (C2) channels.  
 - **Screenshot 7**: Netstat output showing persistent established connections.  
@@ -92,7 +92,7 @@ The threat hunting process was conducted in a structured sequence, guided by the
 
 ---
 
-### 🔎 Step 5 – Firewall Exfiltration Logs  
+###  Step 5 – Firewall Exfiltration Logs  
 - **Action**: Correlated host findings with **firewall logs** to confirm large-scale data exfiltration.  
 - **Finding**: IP `10.1.16.2` was identified as the primary source of exfiltration traffic, transferring large amounts of data out of the network.  
 - **Screenshot 9**: Firewall log snippet highlighting outbound transfer from `10.1.16.2`.  
@@ -100,7 +100,7 @@ The threat hunting process was conducted in a structured sequence, guided by the
 
 ---
 
-### 🔎 Step 6 – Consolidation of Indicators of Compromise (IoCs)  
+###  Step 6 – Consolidation of Indicators of Compromise (IoCs)  
 By the end of the investigation, multiple IoCs were identified across host and network layers:  
 - Suspicious DNS queries: `badsite.ru`  
 - Malicious PowerShell scripts: `lab04demo2.ps1`, `lab04demo3.ps1`  

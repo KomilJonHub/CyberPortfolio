@@ -113,52 +113,53 @@ By the end of the investigation, multiple IoCs were identified across host and n
 
 ---
 
+---
+
 ## Findings & Lessons Learned
 
-This lab reinforced the **importance of proactive threat hunting** in uncovering adversary activity that may bypass automated defenses.  
-
+This investigation demonstrated how **threat hunting connects scattered evidence into a clear attack story**.  
 Key takeaways:  
-- **DNS anomalies are early warning signs** – monitoring Event IDs 1001 and 3010 can uncover suspicious domains.  
-- **PowerShell remains a powerful attacker tool** – scripts often enable persistence and lateral movement.  
-- **Linux logs and scripts reveal attacker methodology** – outbound exfiltration scripts are a common final step.  
-- **Firewall correlation is critical** – only by tying endpoint events with network logs was the exfiltrating host (`10.1.16.2`) confirmed.  
-- **Documenting IoCs ensures actionable intelligence** – findings can feed into SIEM/SOAR for automation in real-world SOCs.  
+- **DNS monitoring matters** – unusual queries can reveal command-and-control channels long before exfiltration happens.  
+- **PowerShell is both a tool and a weapon** – persistence through scheduled tasks is one of the most common attacker tactics.  
+- **Linux visibility is critical** – simple commands like `netstat` or inspecting bash scripts can uncover data exfiltration attempts.  
+- **Network correlation closes the loop** – only by combining host forensics with firewall logs was the exfiltrating host confirmed.  
+- **IoCs are the bridge between incident and defense** – by documenting domains, IPs, and malicious scripts, the organization can harden defenses and feed intelligence into SIEM/SOAR.  
 
-This exercise highlighted how a defender must **connect host-based forensics, network telemetry, and attacker TTPs** to build the full kill chain.
+This exercise showed the importance of **proactive hunting**: you don’t wait for an alert, you dig into the data until the attacker’s path is exposed.  
 
 ---
 
-## Screenshot Reference Table
+## Investigation Screenshots
 
-| # | Step | Description | Screenshot |
-|---|------|-------------|------------|
-| 1 | Firewall Recon | Firewall logs capturing scanning attempts from attacker host | ![](screenshots/1.png) |
-| 2 | DNS Analysis | Event Viewer – filtering DNS logs by Event ID 3010 | ![](screenshots/2.png) |
-| 3 | DNS Analysis | Event ID 1001 showing DNS server assignment | ![](screenshots/3.png) |
-| 4 | DNS Analysis | Suspicious query to malicious domain `badsite.ru` | ![](screenshots/4.png) |
-| 5 | PowerShell Analysis | Execution of `lab04demo2.ps1` showing repeated outbound attempts | ![](screenshots/5.png) |
-| 6 | PowerShell Persistence | Scheduled task activity linked to `lab04demo3.ps1` | ![](screenshots/6.png) |
-| 7 | Linux Netstat | Established malicious connections (C2 channels) | ![](screenshots/7.png) |
-| 8 | Linux Script Review | Malicious exfiltration script `Lab04demo4.sh` targeting external domain | ![](screenshots/8.png) |
-| 9 | Firewall Exfil | Firewall log snippet showing outbound data from `10.1.16.2` | ![](screenshots/9.png) |
-| 10 | Analyst Validation | Confirmation step – identifying exfiltrating host | ![](screenshots/10.png) |
-| 11 | IoC Collection | Documenting suspicious DNS IoCs | ![](screenshots/11.png) |
-| 12 | IoC Collection | Identifying malicious PowerShell script activity | ![](screenshots/12.png) |
-| 13 | IoC Collection | Correlation of Linux persistence and exfiltration artifacts | ![](screenshots/13.png) |
-| 14 | IoC Collection | Firewall logs cross-checked with host evidence | ![](screenshots/14.png) |
-| 15 | Final Confirmation | Analyst answering final lab validation questions | ![](screenshots/15.png) |
-| 16 | Investigation Closure | Wrap-up of IoCs and attack chain confirmation | ![](screenshots/16.png) |
+The following screenshots capture the key steps of the hunt — from DNS anomalies, to PowerShell persistence, Linux attacker scripts, and final exfiltration evidence in the firewall logs. Together, they illustrate how the investigation unfolded:  
+
+![](screenshots/1.png)  
+![](screenshots/2.png)  
+![](screenshots/3.png)  
+![](screenshots/4.png)  
+![](screenshots/5.png)  
+![](screenshots/6.png)  
+![](screenshots/7.png)  
+![](screenshots/8.png)  
+![](screenshots/9.png)  
+![](screenshots/10.png)  
+![](screenshots/11.png)  
+![](screenshots/12.png)  
+![](screenshots/13.png)  
+![](screenshots/14.png)  
+![](screenshots/15.png)  
+![](screenshots/16.png)  
 
 ---
 
 ## Final Summary
 
-This lab simulated a **multi-stage intrusion** and required connecting evidence across different platforms. By progressing step-by-step and validating findings with multiple data sources, I was able to:  
+By walking through this lab, I was able to simulate a **full threat hunt lifecycle**:  
+1. Start from suspicious DNS traffic.  
+2. Pivot into PowerShell logs to uncover persistence.  
+3. Confirm attacker activity in Linux and firewall logs.  
+4. Document the full kill chain and IoCs.  
 
-- Detect **initial reconnaissance and malicious DNS activity**.  
-- Identify **PowerShell persistence mechanisms**.  
-- Confirm **C2 and exfiltration traffic from Linux and firewall logs**.  
-- Deliver a structured **IoC list and validated attack chain**.  
+This mirrors the daily work of SOC analysts and threat hunters: piecing together fragmented events into a coherent narrative that explains **who the attacker was, how they persisted, and what data they tried to steal**.  
 
-This mirrors real-world SOC workflows where **analysts must piece together fragmented signals into a coherent narrative** of the attack.  
 

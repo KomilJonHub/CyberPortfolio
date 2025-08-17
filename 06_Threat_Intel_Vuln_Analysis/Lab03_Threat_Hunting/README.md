@@ -164,15 +164,16 @@ This provided conclusive proof of **data exfiltration**.
 ---
 
 ## Screenshots Reference Table
+
 | Step | Description | Image |
 |------|-------------|-------|
-|1|Firewall logs showing scanning from Kali.|![](./screenshots/1.png)|
-|2|Persistent HTTPS sessions on DC10.|![](./screenshots/2.png)|
-|3|Malicious scheduled task on MS10.|![](./screenshots/3.png)|
-|4|Log review challenges (noise vs. signal).|![](./screenshots/4.png)|
-|5|Attacker’s FTP exfiltration script.|![](./screenshots/5.png)|
-|6|Firewall outbound traffic anomaly.|![](./screenshots/7.png)|
-|7|DNS beaconing to `badsite.ru` on PC10.|![](./screenshots/16.png)|
+|1|Linux firewall (iptables) configured to log inbound scan attempts from Kali.|![](./screenshots/1.png)|
+|2|Windows DC10 showing persistent HTTPS sessions in netstat output.|![](./screenshots/2.png)|
+|3|Malicious scheduled PowerShell task on MS10 for persistence.|![](./screenshots/3.png)|
+|4|Windows Event Viewer highlighting DNS Client log setup and noise filtering.|![](./screenshots/4.png)|
+|5|Attacker’s malicious Bash script (`lab04demo4.sh`) automating FTP exfiltration.|![](./screenshots/5.png)|
+|6|Firewall outbound traffic anomalies tied to FTP transfers.|![](./screenshots/7.png)|
+|7|DNS beaconing to malicious domain `badsite.ru` (PC10 Event Viewer logs).|![](./screenshots/16.png)|
 
 ---
 

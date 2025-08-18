@@ -1,16 +1,16 @@
 # Lab: Performing System Hardening
 
-## 🔍 Scenario
+##  Scenario
 In this lab, I went hands-on with **system hardening** — securing both Windows and Linux machines in a simulated corporate environment (Structureality Inc.).  
 The idea was simple: reduce the attack surface by **removing what isn’t needed** and **updating and securing what is needed**.  
 But the execution wasn’t that simple. Hardening is an iterative grind — update, remove, test, repeat — and I got to see firsthand why companies treat it as an ongoing cycle instead of a one-time fix.  
 
-## 🎯 Objectives
+##  Objectives
 This lab helped me practice real-world CySA+ objectives:  
 - **1.1**: Understanding system and network architecture in the context of security.  
 - **2.5**: Vulnerability response, handling, and management.  
 
-## 🧰 Environment & Tools
+##  Environment & Tools
 I worked across several virtual machines:  
 - **KALI Linux** (for hosts file manipulation and permissions)  
 - **DC10** (Windows Server 2019, domain controller + secure web server)  
@@ -25,7 +25,7 @@ And used:
 
 ---
 
-## 🛠 What I Did
+##  What I Did
 
 ### 1. Managing Device Drivers on Windows
 Hardening starts even with something as boring as drivers. Old or insecure drivers can create vulnerabilities, so I checked the **MS10 server** for outdated device drivers.  
@@ -34,7 +34,7 @@ Hardening starts even with something as boring as drivers. Old or insecure drive
 - Manually updated the driver for the virtual CD-ROM device.  
 - Verified that the driver was already the latest version, so no action needed here.  
 
-📸 *Screenshot proof:*  
+ *Screenshot proof:*  
 ![Device Manager Scan](./screenshots/1.png)  
 ![Driver Status Up To Date](./screenshots/2.png)  
 
@@ -46,19 +46,19 @@ Next, I jumped into the **Kali VM** to mess with DNS resolution using the `/etc/
 - First, I ran `wget juiceshop.local` to see how it resolved. It hit the correct IP (203.0.113.228), and I saw the `index.html` file downloaded.  
 - Checked the `/etc/hosts` file — and yes, it had an entry for `juiceshop.local`.  
 
-📸  
+  
 ![Initial wget and hosts file](./screenshots/3.png)  
 
 - Then I purposely **broke it** by editing the hosts file in nano, changing the IP to `203.0.113.249`.  
 - Retested with `wget` → as expected, the connection failed because the system was now resolving to a bad IP.  
 
-📸  
+  
 ![Editing hosts in nano](./screenshots/4.png)  
 ![wget failure from false entry](./screenshots/5.png)  
 
 - Finally, I fixed it again — set it back to the right IP (`203.0.113.228`) and confirmed with another `wget`. This time it connected and downloaded `index.html.1`.  
 
-📸  
+  
 ![Corrected wget success](./screenshots/11.png)  
 
 **Takeaway**: The `/etc/hosts` file always overrides DNS. This means you can block, redirect, or enforce name resolution locally, but it’s also a risk if attackers drop in malicious mappings.  
@@ -73,7 +73,7 @@ Another big part of hardening is simple: **get rid of junk**. Every unnecessary 
    - Selected CPUID CPU-Z and uninstalled it — since this tool wasn’t needed in production.  
    - Confirmed it was completely removed.  
 
-📸  
+  
 ![Uninstall CPUID](./screenshots/6.png)  
 
 2. **Removed the insecure FTP service**  
@@ -81,7 +81,7 @@ Another big part of hardening is simple: **get rid of junk**. Every unnecessary 
    - Selected the **FTP Server** role and removed it.  
    - Confirmed the removal progress — Windows even restarted after to finalize.  
 
-📸  
+  
 ![Remove Roles and Features Wizard](./screenshots/7.png)  
 ![Removing FTP Service](./screenshots/8.png)  
 
@@ -93,11 +93,11 @@ Another big part of hardening is simple: **get rid of junk**. Every unnecessary 
 Next came the firewall work. The requirement was to **block ICMP traffic** between DC10 and PC10. Here’s how it went:
 
 - First test: from **PC10**, I pinged **DC10**. Replies came back instantly.  
-📸  
+  
 ![Ping Success Before Firewall Block](./screenshots/9.png)  
 
 - Second test: from **DC10**, I pinged **PC10**. As expected, PC10’s firewall was already blocking ICMP — all I got were timeouts.  
-📸  
+  
 ![Ping Block from DC10 to PC10](./screenshots/10.png)  
 
 So clearly, **PC10 was secure**, but **DC10 still replied to ICMP requests**. That had to change.
@@ -106,12 +106,12 @@ So clearly, **PC10 was secure**, but **DC10 still replied to ICMP requests**. Th
 - Located the inbound rule for **File and Printer Sharing (Echo Request - ICMPv4-In)** and set it to **Block the connection**.  
 - Did the same for ICMPv6.  
 
-📸  
+  
 ![Firewall inbound rules block](./screenshots/12.png)  
 
 - After applying the rule, I retested the ping from PC10 to DC10 — this time, total silence: all requests timed out. Exactly what I wanted.  
 
-📸  
+ 
 ![Ping Block Verified](./screenshots/13.png)  
 
 **Takeaway**: In Windows Firewall, simply disabling a rule isn’t enough because other “allow” rules might still let traffic through. A **deny rule always wins**. That’s why explicit blocks are the safest way to enforce policy.
@@ -125,7 +125,7 @@ Finally, I went back into the **Kali machine** to tackle Linux file permissions.
 - Using `chmod 710 demofile.sh`, I locked it down so the **owner had full control, the group could only execute, and others had no access**.  
 - Verified with `ls -l` → it showed exactly as `-rwx--x---`.  
 
-📸  
+  
 ![chmod 710 demofile.sh](./screenshots/14.png)  
 
 ---
@@ -136,7 +136,7 @@ Next, I practiced with **testfile.txt** using **symbolic notation**:
 - `chmod go-r,u-x testfile.txt` → took away read from group/others and execute from owner.  
 - Each time I confirmed the changes with `ls -l`.  
 
-📸  
+  
 ![Symbolic chmod on testfile.txt](./screenshots/15.png)  
 
 ---
@@ -146,14 +146,14 @@ Finally, I used **octal notation** to apply common permission sets:
 - `chmod 644 testfile.txt` → owner read/write, group read, others read (the “normal” safe default).  
 - Watched the file flip between wide-open and properly restricted.  
 
-📸  
+  
 ![Octal chmod examples](./screenshots/16.png)  
 
 **Takeaway**: Playing with these permissions reminded me how small changes (a single `+x` or `-r`) can completely change who has control over a file. In the wrong hands, a lazy permission setting can expose sensitive scripts to everyone on the system.
 
 ---
 
-## 🧠 Lessons Learned
+##  Lessons Learned
 - **System hardening is iterative** — update, remove, validate, repeat. It’s not glamorous, but it’s the bread-and-butter of keeping systems safe.  
 - Even simple things like a **hosts file entry** or a **forgotten service** can be exploited if left unchecked.  
 - **Windows Firewall** taught me a valuable lesson: disabling isn’t enough — explicit denies are the real enforcement.  
@@ -161,7 +161,7 @@ Finally, I used **octal notation** to apply common permission sets:
 
 ---
 
-## ✅ Personal Reflection
+##  Personal Reflection
 What struck me most about this lab is how “ordinary” tasks — uninstalling a tool, editing a text file, blocking ping — are actually the frontline of defense in real organizations.  
 It’s not always about flashy tools or AI-driven detection. Sometimes, it’s literally about **removing what you don’t need, tightening what you do, and verifying at each step**.  
 

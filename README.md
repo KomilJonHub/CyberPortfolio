@@ -24,6 +24,10 @@ Seeking an entry-level role as a **Tier 1 SOC Analyst** where I can apply my ski
 | Linux Command-Line Security                  | _[Coming Soon: Linux VM Labs]_ |
 | Incident Response & Investigation            | _[Coming Soon: SOC IR Lab]_ |
 | Cisco Network Defense Fundamentals           | _[Coming Soon: Cisco Labs]_ |
+| Web Application Security Testing             | [SQL Injection Discovery](08_Web_App_Attacks/Lab01_SQL_Injection) |
+| Cloud Security Hardening                     | [AWS S3 Bucket Hardening](10_Cloud_Security/Lab01_AWS_S3_Bucket_Hardening) |
+| AI Prompt Injection Detection                | [Prompt Injection Detection Script](11_AI_GenerativeSecurity/Lab01_Prompt_Injection_Detection) |
+| Technical Writing & Playbooks                | [Incident Response Playbook](12_Writeups_Documentation/Incident_Response_Playbook.md) |
 
 ---
 
@@ -68,8 +72,12 @@ Seeking an entry-level role as a **Tier 1 SOC Analyst** where I can apply my ski
 - **Linux VM Labs** – File permissions, user management, Bash scripting
 - **Splunk SIEM Labs** – Log investigation, correlation rules, dashboards
 - **Cisco Labs** – CyberOps simulations and assessments
+- **Web Application Attack Labs** – SQL injection and input validation testing
+- **Cloud Security Lab** – Hardening AWS S3 buckets with IAM and logging
+- **AI Security Experiment** – Heuristic prompt injection detection script
+- **Incident Response Playbook** – Template for triage and recovery procedures
 
-Stay tuned — labs will be uploaded and linked soon.
+Stay tuned — additional labs will be uploaded and linked soon.
 
 ---
 

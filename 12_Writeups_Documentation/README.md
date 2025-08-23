@@ -1,3 +1,7 @@
-# 12_Writeups_Documentation
+# Write-ups & Documentation
 
-Placeholder for 12_Writeups_Documentation
+Guides, templates, and study notes collected throughout my cybersecurity journey.
+
+| Title | Summary |
+|-------|---------|
+| [Incident Response Playbook Template](Incident_Response_Playbook.md) | Step-by-step guide covering preparation through lessons learned. |

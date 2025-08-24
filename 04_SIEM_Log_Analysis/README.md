@@ -1,6 +1,6 @@
 # Lab 02: Passive Scanning with Wireshark
 
-> **Summary:** In this lab, I used **Wireshark** to perform passive vulnerability scanning by capturing ICMP and SSH traffic.  
+> In this lab, I used **Wireshark** to perform passive vulnerability scanning by capturing ICMP and SSH traffic.  
 > I identified plaintext vs encrypted communications, determined operating system fingerprints from packet payloads, and analyzed SSH protocol details.  
 > This simulates the tasks of a SOC analyst when monitoring traffic for vulnerabilities and policy compliance.
 
